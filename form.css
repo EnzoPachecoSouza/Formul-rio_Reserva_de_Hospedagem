@@ -3,13 +3,15 @@ body {
     margin: 20px;
     padding: 0;
     box-sizing: border-box;
+    background-color: #f4f4f4;
 }
 
 h1 {
     text-align: center;
+    color: #1f3b5c;
 }
 
-h3{
+h3 {
     color: #ffe220;
 }
 
@@ -24,11 +26,11 @@ form {
 
 label {
     display: block;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     color: white;
 }
 
-input {
+input{
     width: 95%;
     padding: 10px;
     margin-bottom: 15px;
@@ -38,14 +40,13 @@ input {
 }
 
 select {
-    width: 100%;
+    width: 99%;
     padding: 10px;
     margin-bottom: 15px;
-    border: 1px solid #fefefe;
+    border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 16px;
 }
-
 
 button {
     width: 100%;
@@ -54,15 +55,14 @@ button {
     background-color: #f4782a;
     color: white;
     cursor: pointer;
-    font-size: 20px;
-    transition: 1s;
+    font-size: 18px;
+    transition: 0.3s;
     border: none;
 }
 
 button:hover {
     background-color: #ee6916;
     font-weight: 500;
-    padding: 20px;
 }
 
 /* Responsividade */

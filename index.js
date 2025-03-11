@@ -1,64 +1,26 @@
-// Buscar estados da BrasilAPI
-fetch('https://brasilapi.com.br/api/ibge/uf/v1')
-    .then(response => response.json())
-    .then(estados => {
-        let selectEstado = document.getElementById('estado');
-        estados.forEach(estado => {
-            let option = document.createElement('option');
-            option.value = estado.sigla;
-            option.textContent = estado.nome;
-            selectEstado.appendChild(option);
-        });
-    });
-
-// Buscar cidades ao selecionar um estado
-document.getElementById('estado').addEventListener('change', function () {
-    let estadoSelecionado = this.value;
-    let selectCidade = document.getElementById('cidade');
-    selectCidade.innerHTML = '<option value="">Carregando...</option>';
-
-    if (!estadoSelecionado) {
-        selectCidade.innerHTML = '<option value="">Selecione um estado primeiro</option>';
-        return;
-    }
-
-    fetch(`https://brasilapi.com.br/api/ibge/municipios/v1/${estadoSelecionado}`)
-        .then(response => response.json())
-        .then(cidades => {
-            cidades.sort((a, b) => a.nome.localeCompare(b.nome));
-
-            selectCidade.innerHTML = '<option value="">Selecione uma cidade</option>';
-            cidades.forEach(cidade => {
-                let option = document.createElement('option');
-                option.value = cidade.nome;
-                option.textContent = cidade.nome;
-                selectCidade.appendChild(option);
-            });
-        })
-        .catch(error => {
-            console.error("Erro ao carregar cidades:", error);
-            selectCidade.innerHTML = '<option value="">Erro ao carregar cidades</option>';
-        });
-});
-
-// Gerar campos extras para hóspedes com base no tipo de quarto
-document.getElementById('tipoQuarto').addEventListener('change', function () {
-    let tipo = this.value;
+document.getElementById('quantidadePessoas').addEventListener('change', function () {
+    let quantidade = parseInt(this.value);
     let dadosExtras = document.getElementById('dadosExtras');
     dadosExtras.innerHTML = '';
 
-    if (!tipo) return;
+    if (!quantidade) return;
 
-    let qtd = tipo === 'individual' ? 1 : tipo === 'duplo' ? 2 : tipo === 'triplo' ? 3 : 4;
-
-    for (let i = 1; i <= qtd; i++) {
+    for (let i = 1; i <= quantidade; i++) {
         let div = document.createElement('div');
         div.innerHTML = `
             <h3>Pessoa ${i}</h3>
             <label>Nome: <input type="text" class="pessoaNome" required></label>
             <label>CPF: <input type="text" class="pessoaCPF" required></label>
+            <label>RG: <input type="text" class="pessoaRG" required></label>
             <label>Data de Nascimento: <input type="date" class="pessoaNascimento" required></label>
+            <label>Endereço:</label>
+            <input type="text" class="pessoaCEP" placeholder="CEP" required>
+            <input type="text" class="pessoaRua" placeholder="Rua" required>
+            <input type="text" class="pessoaNumero" placeholder="Número" required>
+            <input type="text" class="pessoaCidade" placeholder="Cidade" required>
+            <input type="text" class="pessoaEstado" placeholder="Estado" required>
             <label>Celular: <input type="tel" class="pessoaCelular" required></label>
+            <label>Email: <input type="email" class="pessoaEmail" required></label>
         `;
         dadosExtras.appendChild(div);
     }
@@ -66,35 +28,62 @@ document.getElementById('tipoQuarto').addEventListener('change', function () {
     aplicarMascaras();
 });
 
-// Aplicar máscaras aos campos de CPF e Celular
+// Aplicar máscaras nos campos
 function aplicarMascaras() {
     Inputmask("999.999.999-99").mask(document.querySelectorAll(".pessoaCPF"));
+    Inputmask("99.999.999-9").mask(document.querySelectorAll(".pessoaRG"));
     Inputmask("(99) 99999-9999").mask(document.querySelectorAll(".pessoaCelular"));
     Inputmask("(99) 99999-9999").mask(document.getElementById("celular"));
 }
+
+// Preencher endereço a partir do CEP
+document.addEventListener("input", function (event) {
+    if (event.target.classList.contains("pessoaCEP")) {
+        let cep = event.target.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    let parent = event.target.parentElement;
+                    if (!data.erro) {
+                        parent.querySelector(".pessoaRua").value = data.logradouro || "";
+                        parent.querySelector(".pessoaCidade").value = data.localidade || "";
+                        parent.querySelector(".pessoaEstado").value = data.uf || "";
+                    } else {
+                        alert("CEP não encontrado!");
+                    }
+                })
+                .catch(() => alert("Erro ao buscar CEP!"));
+        }
+    }
+});
 
 // Envio para WhatsApp
 document.getElementById('reservaForm').addEventListener('submit', function (event) {
     event.preventDefault();
     let nome = document.getElementById('nome').value;
-    let estado = document.getElementById('estado').selectedOptions[0].text;
-    let cidade = document.getElementById('cidade').selectedOptions[0].text;
     let celular = document.getElementById('celular').value;
-    let tipoQuarto = document.getElementById('tipoQuarto').value;
+    let quantidadePessoas = document.getElementById('quantidadePessoas').value;
 
-    let mensagem = `Olá Capital da Fé Turismo, vim através do formulário de reserva de hospedagem!\n\n *Quem está entrando em contato:*`;
-    mensagem += `\nNome: ${nome} \nEstado: ${estado} \nCidade: ${cidade}  \nCelular: ${celular} \nQuarto: ${tipoQuarto}\n`;
+    let mensagem = `Olá Capital da Fé Turismo, vim através do formulário de reserva!\n\n Pessoa que está entrando em contato:`;
+    mensagem += `*Nome:* ${nome}\n*Celular:* ${celular}\n*Quantidade de Pessoas:* ${quantidadePessoas}\n\n`;
 
     let nomes = document.querySelectorAll('.pessoaNome');
     let cpfs = document.querySelectorAll('.pessoaCPF');
+    let rgs = document.querySelectorAll('.pessoaRG');
     let nascimentos = document.querySelectorAll('.pessoaNascimento');
+    let ruas = document.querySelectorAll('.pessoaRua');
+    let numeros = document.querySelectorAll('.pessoaNumero');
+    let cidades = document.querySelectorAll('.pessoaCidade');
+    let estados = document.querySelectorAll('.pessoaEstado');
     let celulares = document.querySelectorAll('.pessoaCelular');
+    let emails = document.querySelectorAll('.pessoaEmail');
 
     for (let i = 0; i < nomes.length; i++) {
-        mensagem += `\n*Pessoa ${i + 1}:* ${nomes[i].value}, \n*CPF:* ${cpfs[i].value}, \n*Data de Nascimento:* ${nascimentos[i].value}, \n*Celular:* ${celulares[i].value}`;
+        mensagem += `*Pessoa ${i + 1}:* ${nomes[i].value}, \n*CPF:* ${cpfs[i].value}, \n*RG:* ${rgs[i].value}, \n*Data de Nascimento:* ${nascimentos[i].value}, \n*Endereço:* ${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}, \n*Celular:* ${celulares[i].value}, \n*Email:* ${emails[i].value}\n\n`;
     }
 
-    mensagem += `\n\nQuero confirmar minha reserva e prosseguir com o processo de pagamento!`;
+    mensagem += `Quero confirmar minha reserva e prosseguir com o processo de pagamento!`;
 
     let numeroFixo = "5512991382679"; 
     let linkWhatsApp = `https://wa.me/${numeroFixo}?text=${encodeURIComponent(mensagem)}`;

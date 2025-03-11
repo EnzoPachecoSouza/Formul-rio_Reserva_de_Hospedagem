@@ -7,11 +7,9 @@
     <title>Formulário de Reserva</title>
     <link rel="stylesheet" href="form.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inputmask/5.0.7/inputmask.min.js"></script>
-    <!-- Biblioteca para máscara -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -20,26 +18,18 @@
         <label for="nome">Nome:</label>
         <input type="text" id="nome" placeholder="Nome Completo" required>
 
-        <label for="estado">Estado:</label>
-        <select id="estado" required>
-            <option value="">Selecione um estado</option>
-        </select>
-
-        <label for="cidade">Cidade:</label>
-        <select id="cidade" required>
-            <option value="">Selecione uma cidade</option>
-        </select>
-
         <label for="celular">Número de Celular:</label>
         <input type="tel" id="celular" placeholder="(xx) xxxxx-xxxx" required>
 
-        <label for="tipoQuarto">Tipo de Quarto:</label>
-        <select id="tipoQuarto" required>
-            <option value="">Selecionar opção</option>
-            <option value="individual">Individual</option>
-            <option value="duplo">Duplo</option>
-            <option value="triplo">Triplo</option>
-            <option value="quadruplo">Quadruplo</option>
+        <label for="quantidadePessoas">Quantidade de Pessoas:</label>
+        <select id="quantidadePessoas" required>
+            <option value="">Selecione</option>
+            <option value="1">1 Pessoa</option>
+            <option value="2">2 Pessoas</option>
+            <option value="3">3 Pessoas</option>
+            <option value="4">4 Pessoas</option>
+            <option value="5">5 Pessoas</option>
+            <option value="6">6 Pessoas</option>
         </select>
 
         <div id="dadosExtras"></div>
