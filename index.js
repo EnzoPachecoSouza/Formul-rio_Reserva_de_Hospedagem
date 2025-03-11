@@ -66,7 +66,7 @@ document.getElementById('reservaForm').addEventListener('submit', function (even
     let quantidadePessoas = document.getElementById('quantidadePessoas').value;
 
     let mensagem = `Olá Capital da Fé Turismo, vim através do formulário de reserva!\n\n Pessoa que está entrando em contato:`;
-    mensagem += `*Nome:* ${nome}\n*Celular:* ${celular}\n*Quantidade de Pessoas:* ${quantidadePessoas}\n\n`;
+    mensagem += `\n*Nome:* ${nome}\n*Celular:* ${celular}\n*Quantidade de Pessoas:* ${quantidadePessoas}\n\n`;
 
     let nomes = document.querySelectorAll('.pessoaNome');
     let cpfs = document.querySelectorAll('.pessoaCPF');
@@ -80,7 +80,10 @@ document.getElementById('reservaForm').addEventListener('submit', function (even
     let emails = document.querySelectorAll('.pessoaEmail');
 
     for (let i = 0; i < nomes.length; i++) {
-        mensagem += `*Pessoa ${i + 1}:* ${nomes[i].value}, \n*CPF:* ${cpfs[i].value}, \n*RG:* ${rgs[i].value}, \n*Data de Nascimento:* ${nascimentos[i].value}, \n*Endereço:* ${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}, \n*Celular:* ${celulares[i].value}, \n*Email:* ${emails[i].value}\n\n`;
+        let dataNascimento = new Date(nascimentos[i].value);
+        let dataFormatada = dataNascimento.toLocaleDateString('pt-BR');
+        
+        mensagem += `*Pessoa ${i + 1}:* ${nomes[i].value}, \n*CPF:* ${cpfs[i].value}, \n*RG:* ${rgs[i].value}, \n*Data de Nascimento:* ${dataFormatada}, \n*Endereço:* ${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}, \n*Celular:* ${celulares[i].value}, \n*Email:* ${emails[i].value}\n\n`;
     }
 
     mensagem += `Quero confirmar minha reserva e prosseguir com o processo de pagamento!`;
