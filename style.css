@@ -64,6 +64,13 @@ h3 {
 p {
     font-size: 16px;
     color: #666;
+    font-weight: 500;
+}
+
+.description{
+    font-size: 16px;
+    color: #666;
+    text-align: justify;
 }
 
 /* Botão de reserva */
