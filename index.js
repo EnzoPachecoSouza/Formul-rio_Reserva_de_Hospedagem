@@ -9,9 +9,9 @@ document.getElementById('quantidadePessoas').addEventListener('change', function
         let div = document.createElement('div');
         div.innerHTML = `
             <h3>Pessoa ${i}</h3>
-            <label>Nome: <input type="text" class="pessoaNome" required></label>
-            <label>CPF: <input type="text" class="pessoaCPF" required></label>
-            <label>RG: <input type="text" class="pessoaRG" required></label>
+            <label>Nome: <input type="text" class="pessoaNome" placeholder="Nome Completo" required></label>
+            <label>CPF: <input type="text" class="pessoaCPF" placeholder="xxx.xxx.xxx-xx" required></label>
+            <label>RG: <input type="text" class="pessoaRG" placeholder="xx.xxx.xxx-x" required></label>
             <label>Data de Nascimento: <input type="date" class="pessoaNascimento" required></label>
             <label>Endereço:</label>
             <input type="text" class="pessoaCEP" placeholder="CEP" required>
@@ -19,8 +19,8 @@ document.getElementById('quantidadePessoas').addEventListener('change', function
             <input type="text" class="pessoaNumero" placeholder="Número" required>
             <input type="text" class="pessoaCidade" placeholder="Cidade" required>
             <input type="text" class="pessoaEstado" placeholder="Estado" required>
-            <label>Celular: <input type="tel" class="pessoaCelular" required></label>
-            <label>Email: <input type="email" class="pessoaEmail" required></label>
+            <label>Celular: <input type="tel" class="pessoaCelular" placeholder="(xx) xxxxx-xxxx" required></label>
+            <label>Email: <input type="email" class="pessoaEmail" placeholder="Email" required></label>
         `;
         dadosExtras.appendChild(div);
     }
