@@ -58,6 +58,7 @@ button {
     font-size: 18px;
     transition: 0.3s;
     border: none;
+    margin-top: 20px;
 }
 
 .aviso{
@@ -98,5 +99,8 @@ button:hover {
     }
     .aviso{
         font-size: 14px;
+    }
+    button{
+        margin-top: 10px;
     }
 }
