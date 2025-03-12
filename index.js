@@ -15,8 +15,14 @@ document.getElementById('quantidadePessoas').addEventListener('change', function
             <label>Data de Nascimento: <input type="date" class="pessoaNascimento" required></label>
             <label>Diocese: <input type="text" class="pessoaDiocese" placeholder="Nome da Diocese" required></label>
             <label>Grupo de oração: <input type="text" class="pessoaGrupo" placeholder="Nome do Grupo" required></label>
-            <label>Data de Check-in no Hotel/Pousada: <input type="date" class="pessoaCheckin" required></label>
-            <label>Data de Check-out no Hotel/Pousada: <input type="date" class="pessoaCheckout" required></label>
+            <label>Hotel/Pousada desejado:</label>
+            <select class="pessoaHotel" required>
+                <option value="">Selecione a opção</option>
+                <option value="Hotel Torino Plaza">Hotel Torino Plaza</option>
+                <option value="Pousada São Nicolau">Pousada São Nicolau</option>
+            </select>
+            <label>Data de Check-in: <input type="date" class="pessoaCheckin" required></label>
+            <label>Data de Check-out: <input type="date" class="pessoaCheckout" required></label>
             <label>Endereço:</label>
             <input type="text" class="pessoaCEP" placeholder="CEP" required>
             <input type="text" class="pessoaRua" placeholder="Rua" required>
@@ -29,51 +35,56 @@ document.getElementById('quantidadePessoas').addEventListener('change', function
         dadosExtras.appendChild(div);
     }
 
-    // Adiciona evento para buscar endereço ao digitar o CEP
-    document.querySelectorAll('.pessoaCEP').forEach(cepInput => {
-        cepInput.addEventListener('input', function () {
-            let cep = this.value.replace(/\D/g, ''); // Remove caracteres não numéricos
-            if (cep.length === 8) {
-                buscarEndereco(cep, this);
+    document.querySelectorAll('.pessoaCEP').forEach(input => {
+        input.addEventListener('blur', function () {
+            let cep = this.value.replace(/\D/g, '');
+            if (cep.length !== 8) {
+                alert('CEP inválido!');
+                return;
             }
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        alert('CEP não encontrado!');
+                        return;
+                    }
+
+                    let container = this.closest('div');
+                    if (container) {
+                        container.querySelector('.pessoaRua').value = data.logradouro;
+                        container.querySelector('.pessoaCidade').value = data.localidade;
+                        container.querySelector('.pessoaEstado').value = data.uf;
+                    }
+                })
+                .catch(() => alert('Erro ao buscar o CEP!'));
         });
     });
+
 });
 
-// Função para buscar o endereço via API do ViaCEP
-function buscarEndereco(cep, campoCEP) {
-    let url = `https://viacep.com.br/ws/${cep}/json/`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (!data.erro) {
-                let divPessoa = campoCEP.closest('div');
-                divPessoa.querySelector('.pessoaRua').value = data.logradouro || '';
-                divPessoa.querySelector('.pessoaCidade').value = data.localidade || '';
-                divPessoa.querySelector('.pessoaEstado').value = data.uf || '';
-            } else {
-                alert('CEP não encontrado!');
-            }
-        })
-        .catch(error => console.error('Erro ao buscar o CEP:', error));
+// Validação e envio do formulário
+function formatarDataParaBR(dataISO) {
+    let partes = dataISO.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
-// Envio do formulário
 document.getElementById('reservaForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
     let nome = document.getElementById('nome').value;
     let celular = document.getElementById('celular').value;
     let quantidadePessoas = document.getElementById('quantidadePessoas').value;
-
     let pessoas = [];
+
     let nomes = document.querySelectorAll('.pessoaNome');
     let cpfs = document.querySelectorAll('.pessoaCPF');
     let rgs = document.querySelectorAll('.pessoaRG');
     let nascimentos = document.querySelectorAll('.pessoaNascimento');
     let dioceses = document.querySelectorAll('.pessoaDiocese');
     let grupos = document.querySelectorAll('.pessoaGrupo');
+    let hoteis = document.querySelectorAll('.pessoaHotel');
     let checkins = document.querySelectorAll('.pessoaCheckin');
     let checkouts = document.querySelectorAll('.pessoaCheckout');
     let ruas = document.querySelectorAll('.pessoaRua');
@@ -84,46 +95,50 @@ document.getElementById('reservaForm').addEventListener('submit', function (even
     let emails = document.querySelectorAll('.pessoaEmail');
 
     for (let i = 0; i < nomes.length; i++) {
+        if (hoteis[i].value === '') {
+            alert('Por favor, selecione um hotel ou pousada para cada pessoa.');
+            return;
+        }
+
         pessoas.push({
             nome: nomes[i].value,
             cpf: cpfs[i].value,
             rg: rgs[i].value,
-            nascimento: nascimentos[i].value,
+            nascimento: formatarDataParaBR(nascimentos[i].value),
             diocese: dioceses[i].value,
             grupo: grupos[i].value,
-            checkin: checkins[i].value,
-            checkout: checkouts[i].value,
+            hotel: hoteis[i].value,
+            checkin: formatarDataParaBR(checkins[i].value),
+            checkout: formatarDataParaBR(checkouts[i].value),
             endereco: `${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}`,
             celular: celulares[i].value,
             email: emails[i].value
         });
     }
 
-    let dadosReserva = {
-        nome: nome,
-        celular: celular,
-        quantidadePessoas: quantidadePessoas,
-        pessoas: pessoas
-    };
+    let dadosReserva = { nome, celular, quantidadePessoas, pessoas };
 
-    // **1. Enviar para o Google Sheets**
-    fetch("https://script.google.com/macros/s/AKfycbzhHSn2BADBnFK3C3AXucfkf_mL72b9n9j5AjmEslsOCTMrQfB5DzTzuWVjxZipXtca/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbxZ6lbhIZha5Dx8v-uvhKDqmDfXRRGyWKv4kgweTHkNNuHz6I8fB1B_Es_IwegthHsN/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dadosReserva)
-    }).then(() => alert("Dados prontos para enviar no WhatsApp"));
+    }).then(() => alert("Dados enviados!"));
 
-    // **2. Enviar para WhatsApp**
-    let mensagem = `Olá Capital da Fé Turismo, vim através do formulário de reserva!\n\n Pessoa que está entrando em contato:\n*Nome:* ${nome}\n*Celular:* ${celular}\n*Quantidade de Pessoas:* ${quantidadePessoas}\n\n`;
+    let mensagem = `Olá Capital da Fé Turismo, vim através do formulário fazer minha reserva!
+
+*Cliente que está entrando em contato para reservar:*
+Nome: ${nome}
+Celular: ${celular}
+Quantidade de Pessoas: ${quantidadePessoas}\n\n`;
 
     pessoas.forEach((pessoa, i) => {
-        mensagem += `*Pessoa ${i + 1}:* ${pessoa.nome}, \n*CPF:* ${pessoa.cpf}, \n*RG:* ${pessoa.rg}, \n*Data de Nascimento:* ${pessoa.nascimento}, \n*Diocese:* ${pessoa.diocese}, \n*Grupo de Oração:* ${pessoa.grupo}, \n*Check-in:* ${pessoa.checkin}, \n*Check-out:* ${pessoa.checkout}, \n*Endereço:* ${pessoa.endereco}, \n*Celular:* ${pessoa.celular}, \n*Email:* ${pessoa.email}\n\n`;
+        mensagem += `*Pessoa ${i + 1}:* ${pessoa.nome}, \n*CPF:* ${pessoa.cpf}, \n*RG:* ${pessoa.rg}, \n*Hotel:* ${pessoa.hotel}, \n*Check-in:* ${pessoa.checkin}, \n*Check-out:* ${pessoa.checkout}, \n*Endereço:* ${pessoa.endereco}, \n*Celular:* ${pessoa.celular}, \n*Email:* ${pessoa.email}\n\n`;
     });
 
-    mensagem += `Quero confirmar minha reserva e prosseguir com o processo de pagamento!`;
+    mensagem += `\nQuero confirmar minha reserva e prosseguir com o processo de pagamento!`;
 
-    let numeroFixo = "5512992183865"; 
+    let numeroFixo = "5512992183865";
     let linkWhatsApp = `https://wa.me/${numeroFixo}?text=${encodeURIComponent(mensagem)}`;
     window.open(linkWhatsApp, '_blank');
 });
