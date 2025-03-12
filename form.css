@@ -90,4 +90,13 @@ button:hover {
     input, select, button {
         font-size: 14px;
     }
+    input{
+        width: 90%;
+    }
+    h1{
+        font-size: 25px;
+    }
+    .aviso{
+        font-size: 14px;
+    }
 }
