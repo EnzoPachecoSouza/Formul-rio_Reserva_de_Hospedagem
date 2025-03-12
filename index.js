@@ -29,49 +29,45 @@ document.getElementById('quantidadePessoas').addEventListener('change', function
         dadosExtras.appendChild(div);
     }
 
-    aplicarMascaras();
+    // Adiciona evento para buscar endereço ao digitar o CEP
+    document.querySelectorAll('.pessoaCEP').forEach(cepInput => {
+        cepInput.addEventListener('input', function () {
+            let cep = this.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+            if (cep.length === 8) {
+                buscarEndereco(cep, this);
+            }
+        });
+    });
 });
 
-// Aplicar máscaras nos campos
-function aplicarMascaras() {
-    Inputmask("999.999.999-99").mask(document.querySelectorAll(".pessoaCPF"));
-    Inputmask("99.999.999-9").mask(document.querySelectorAll(".pessoaRG"));
-    Inputmask("(99) 99999-9999").mask(document.querySelectorAll(".pessoaCelular"));
-    Inputmask("(99) 99999-9999").mask(document.getElementById("celular"));
+// Função para buscar o endereço via API do ViaCEP
+function buscarEndereco(cep, campoCEP) {
+    let url = `https://viacep.com.br/ws/${cep}/json/`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (!data.erro) {
+                let divPessoa = campoCEP.closest('div');
+                divPessoa.querySelector('.pessoaRua').value = data.logradouro || '';
+                divPessoa.querySelector('.pessoaCidade').value = data.localidade || '';
+                divPessoa.querySelector('.pessoaEstado').value = data.uf || '';
+            } else {
+                alert('CEP não encontrado!');
+            }
+        })
+        .catch(error => console.error('Erro ao buscar o CEP:', error));
 }
 
-// Preencher endereço a partir do CEP
-document.addEventListener("input", function (event) {
-    if (event.target.classList.contains("pessoaCEP")) {
-        let cep = event.target.value.replace(/\D/g, '');
-        if (cep.length === 8) {
-            fetch(`https://viacep.com.br/ws/${cep}/json/`)
-                .then(response => response.json())
-                .then(data => {
-                    let parent = event.target.parentElement;
-                    if (!data.erro) {
-                        parent.querySelector(".pessoaRua").value = data.logradouro || "";
-                        parent.querySelector(".pessoaCidade").value = data.localidade || "";
-                        parent.querySelector(".pessoaEstado").value = data.uf || "";
-                    } else {
-                        alert("CEP não encontrado!");
-                    }
-                })
-                .catch(() => alert("Erro ao buscar CEP!"));
-        }
-    }
-});
-
-// Envio para WhatsApp
+// Envio do formulário
 document.getElementById('reservaForm').addEventListener('submit', function (event) {
     event.preventDefault();
+
     let nome = document.getElementById('nome').value;
     let celular = document.getElementById('celular').value;
     let quantidadePessoas = document.getElementById('quantidadePessoas').value;
 
-    let mensagem = `Olá Capital da Fé Turismo, vim através do formulário de reserva!\n\n Pessoa que está entrando em contato:`;
-    mensagem += `\n*Nome:* ${nome}\n*Celular:* ${celular}\n*Quantidade de Pessoas:* ${quantidadePessoas}\n\n`;
-
+    let pessoas = [];
     let nomes = document.querySelectorAll('.pessoaNome');
     let cpfs = document.querySelectorAll('.pessoaCPF');
     let rgs = document.querySelectorAll('.pessoaRG');
@@ -88,12 +84,42 @@ document.getElementById('reservaForm').addEventListener('submit', function (even
     let emails = document.querySelectorAll('.pessoaEmail');
 
     for (let i = 0; i < nomes.length; i++) {
-        let dataNascimento = new Date(nascimentos[i].value).toLocaleDateString('pt-BR');
-        let dataCheckin = new Date(checkins[i].value).toLocaleDateString('pt-BR');
-        let dataCheckout = new Date(checkouts[i].value).toLocaleDateString('pt-BR');
-        
-        mensagem += `*Pessoa ${i + 1}:* ${nomes[i].value}, \n*CPF:* ${cpfs[i].value}, \n*RG:* ${rgs[i].value}, \n*Data de Nascimento:* ${dataNascimento}, \n*Diocese:* ${dioceses[i].value}, \n*Grupo de Oração:* ${grupos[i].value}, \n*Check-in:* ${dataCheckin}, \n*Check-out:* ${dataCheckout}, \n*Endereço:* ${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}, \n*Celular:* ${celulares[i].value}, \n*Email:* ${emails[i].value}\n\n`;
+        pessoas.push({
+            nome: nomes[i].value,
+            cpf: cpfs[i].value,
+            rg: rgs[i].value,
+            nascimento: nascimentos[i].value,
+            diocese: dioceses[i].value,
+            grupo: grupos[i].value,
+            checkin: checkins[i].value,
+            checkout: checkouts[i].value,
+            endereco: `${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}`,
+            celular: celulares[i].value,
+            email: emails[i].value
+        });
     }
+
+    let dadosReserva = {
+        nome: nome,
+        celular: celular,
+        quantidadePessoas: quantidadePessoas,
+        pessoas: pessoas
+    };
+
+    // **1. Enviar para o Google Sheets**
+    fetch("https://script.google.com/macros/s/AKfycbzhHSn2BADBnFK3C3AXucfkf_mL72b9n9j5AjmEslsOCTMrQfB5DzTzuWVjxZipXtca/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dadosReserva)
+    }).then(() => alert("Dados prontos para enviar no WhatsApp"));
+
+    // **2. Enviar para WhatsApp**
+    let mensagem = `Olá Capital da Fé Turismo, vim através do formulário de reserva!\n\n Pessoa que está entrando em contato:\n*Nome:* ${nome}\n*Celular:* ${celular}\n*Quantidade de Pessoas:* ${quantidadePessoas}\n\n`;
+
+    pessoas.forEach((pessoa, i) => {
+        mensagem += `*Pessoa ${i + 1}:* ${pessoa.nome}, \n*CPF:* ${pessoa.cpf}, \n*RG:* ${pessoa.rg}, \n*Data de Nascimento:* ${pessoa.nascimento}, \n*Diocese:* ${pessoa.diocese}, \n*Grupo de Oração:* ${pessoa.grupo}, \n*Check-in:* ${pessoa.checkin}, \n*Check-out:* ${pessoa.checkout}, \n*Endereço:* ${pessoa.endereco}, \n*Celular:* ${pessoa.celular}, \n*Email:* ${pessoa.email}\n\n`;
+    });
 
     mensagem += `Quero confirmar minha reserva e prosseguir com o processo de pagamento!`;
 
