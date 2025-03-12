@@ -60,6 +60,11 @@ button {
     border: none;
 }
 
+.aviso{
+    text-align: center;
+    font-size: 18px;
+}
+
 button:hover {
     background-color: #ee6916;
     font-weight: 500;
