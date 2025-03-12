@@ -13,6 +13,10 @@ document.getElementById('quantidadePessoas').addEventListener('change', function
             <label>CPF: <input type="text" class="pessoaCPF" placeholder="xxx.xxx.xxx-xx" required></label>
             <label>RG: <input type="text" class="pessoaRG" placeholder="xx.xxx.xxx-x" required></label>
             <label>Data de Nascimento: <input type="date" class="pessoaNascimento" required></label>
+            <label>Diocese: <input type="text" class="pessoaDiocese" placeholder="Nome da Diocese" required></label>
+            <label>Grupo de oração: <input type="text" class="pessoaGrupo" placeholder="Nome do Grupo" required></label>
+            <label>Data de Check-in no Hotel/Pousada: <input type="date" class="pessoaCheckin" required></label>
+            <label>Data de Check-out no Hotel/Pousada: <input type="date" class="pessoaCheckout" required></label>
             <label>Endereço:</label>
             <input type="text" class="pessoaCEP" placeholder="CEP" required>
             <input type="text" class="pessoaRua" placeholder="Rua" required>
@@ -72,6 +76,10 @@ document.getElementById('reservaForm').addEventListener('submit', function (even
     let cpfs = document.querySelectorAll('.pessoaCPF');
     let rgs = document.querySelectorAll('.pessoaRG');
     let nascimentos = document.querySelectorAll('.pessoaNascimento');
+    let dioceses = document.querySelectorAll('.pessoaDiocese');
+    let grupos = document.querySelectorAll('.pessoaGrupo');
+    let checkins = document.querySelectorAll('.pessoaCheckin');
+    let checkouts = document.querySelectorAll('.pessoaCheckout');
     let ruas = document.querySelectorAll('.pessoaRua');
     let numeros = document.querySelectorAll('.pessoaNumero');
     let cidades = document.querySelectorAll('.pessoaCidade');
@@ -80,15 +88,16 @@ document.getElementById('reservaForm').addEventListener('submit', function (even
     let emails = document.querySelectorAll('.pessoaEmail');
 
     for (let i = 0; i < nomes.length; i++) {
-        let dataNascimento = new Date(nascimentos[i].value);
-        let dataFormatada = dataNascimento.toLocaleDateString('pt-BR');
+        let dataNascimento = new Date(nascimentos[i].value).toLocaleDateString('pt-BR');
+        let dataCheckin = new Date(checkins[i].value).toLocaleDateString('pt-BR');
+        let dataCheckout = new Date(checkouts[i].value).toLocaleDateString('pt-BR');
         
-        mensagem += `*Pessoa ${i + 1}:* ${nomes[i].value}, \n*CPF:* ${cpfs[i].value}, \n*RG:* ${rgs[i].value}, \n*Data de Nascimento:* ${dataFormatada}, \n*Endereço:* ${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}, \n*Celular:* ${celulares[i].value}, \n*Email:* ${emails[i].value}\n\n`;
+        mensagem += `*Pessoa ${i + 1}:* ${nomes[i].value}, \n*CPF:* ${cpfs[i].value}, \n*RG:* ${rgs[i].value}, \n*Data de Nascimento:* ${dataNascimento}, \n*Diocese:* ${dioceses[i].value}, \n*Grupo de Oração:* ${grupos[i].value}, \n*Check-in:* ${dataCheckin}, \n*Check-out:* ${dataCheckout}, \n*Endereço:* ${ruas[i].value}, ${numeros[i].value}, ${cidades[i].value} - ${estados[i].value}, \n*Celular:* ${celulares[i].value}, \n*Email:* ${emails[i].value}\n\n`;
     }
 
     mensagem += `Quero confirmar minha reserva e prosseguir com o processo de pagamento!`;
 
-    let numeroFixo = "5512991382679"; 
+    let numeroFixo = "5512992183865"; 
     let linkWhatsApp = `https://wa.me/${numeroFixo}?text=${encodeURIComponent(mensagem)}`;
     window.open(linkWhatsApp, '_blank');
 });

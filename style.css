@@ -1,4 +1,3 @@
-/* Reset básico */
 * {
     margin: 0;
     padding: 0;
@@ -11,7 +10,6 @@ body {
     background-color: #f8f9fa;
     color: #333;
     text-align: center;
-    padding: 20px;
 }
 
 /* Cabeçalho */
@@ -29,6 +27,11 @@ h2 {
     color: #444;
 }
 
+h3 {
+    margin: 10px 0;
+    font-size: 25px;
+}
+
 /* Container dos cards */
 .container {
     display: flex;
@@ -44,45 +47,49 @@ h2 {
     border-radius: 10px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 300px;
+    width: 400px;
+    height: 550px;
     transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .card:hover {
     transform: scale(1.05);
 }
 
-.card img {
+.swiper {
     width: 100%;
+    height: 250px;
+}
+
+.swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 10px;
 }
 
-h3 {
-    margin: 10px 0;
-}
-
 .vagas {
-    font-size: 16px;
+    font-size: 18px;
     color: #666;
     font-weight: 700;
 }
 
-.description{
+.description {
     font-size: 16px;
     color: #666;
     text-align: justify;
+    padding: 0 10px;
 }
 
-.info p{
-    margin-top: 30px;
+.info p {
+    margin-top: 35px;
     font-size: 20px;
     color: #1f3b5c;
     font-weight: 700;
-}
-
-.hotel{
-    width: 100%;
-    height:  130px;
 }
 
 /* Botão de reserva */
@@ -109,5 +116,14 @@ button:hover {
     .container {
         flex-direction: column;
         align-items: center;
+    }
+
+    .card {
+        width: 90%;
+        height: auto;
+    }
+
+    .swiper {
+        height: 200px;
     }
 }
