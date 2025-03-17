@@ -72,11 +72,11 @@ h3 {
     border-radius: 10px;
 }
 
-/* .vagas {
+.location {
     font-size: 18px;
     color: #666;
     font-weight: 700;
-} */
+} 
 
 .description {
     font-size: 16px;
@@ -142,9 +142,9 @@ button:hover {
         height: 400px;
     }
 
-    /* .vagas {
+    .location {
         font-size: 15px;
-    } */
+    } 
     
     .description {
         font-size: 14px;

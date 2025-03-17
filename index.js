@@ -20,6 +20,7 @@ document.getElementById('quantidadePessoas').addEventListener('change', function
                 <option value="">Selecione a opção</option>
                 <option value="Hotel Torino Plaza">Hotel Torino Plaza</option>
                 <option value="Pousada São Nicolau">Pousada São Nicolau</option>
+                <option value="Hotel Portal dos Devotos">Hotel Portal dos Devotos</option>
             </select>
             <label>Data de Check-in: <input type="date" class="pessoaCheckin" required></label>
             <label>Data de Check-out: <input type="date" class="pessoaCheckout" required></label>
